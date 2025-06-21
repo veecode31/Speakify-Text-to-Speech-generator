@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speakify</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillaselectbox@latest/dist/vanillaSelectBox.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanillaselectbox@latest/dist/vanillaSelectBox.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-none mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{{ url_for('static', filename='ai-vedant.png') }}" alt="AI Vedant Logo" width="60" height="60"
+                 class="d-inline-block align-text-top me-2">
+            <strong class="logo-text">Speakify</strong>
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="container custom-section text-left mb-8">
+        <div class="row align-items-center">
+            <!-- Left Column -->
+            <div class="col">
+                <h1 style="font-weight: bold;" class="section-title">
+                    Speakify the text-to-speech<br>with high quality,<br>human-like AI voice generator.
+                </h1>
+            </div>
+
+            <!-- Vertical Divider -->
+            <div class="col-auto">
+                <div class="gold-divider"></div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col">
+                <p class="section-description">
+                    Welcome to our Text-to-Speech platform! 🎤✨ Transform your text into lifelike speech in just a few clicks. Whether you're looking to enhance accessibility or bring your content to life, our easy-to-use tool will make it happen in no time. 🔊🚀 Start now and experience the magic of voice! 🎧
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" class="text-center mt-4">
+        <textarea name="text" class="form-control mb-3" rows="4" placeholder="Enter text here...">{{ text }}</textarea>
+
+        <select name="voice" class="form-select mb-3" id="voiceSelect">
+            {% for voice in voices %}
+            <option value="{{ voice.ShortName }}" {% if voice.ShortName== selected_voice %}selected{% endif %}>
+                {{ voice.FriendlyName }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <select name="target_lang" class="form-select mb-3" id="target_lang">
+            <option value="">-- No Translation --</option>
+            <option value="en" {% if request.form.get('target_lang') == 'en' %}selected{% endif %}>English</option>
+            <option value="hi" {% if request.form.get('target_lang') == 'hi' %}selected{% endif %}>Hindi</option>
+            <option value="mr" {% if request.form.get('target_lang') == 'mr' %}selected{% endif %}>Marathi</option>
+            <option value="te" {% if request.form.get('target_lang') == 'te' %}selected{% endif %}>Telugu</option>
+            <option value="ta" {% if request.form.get('target_lang') == 'ta' %}selected{% endif %}>Tamil</option>
+            <option value="gu" {% if request.form.get('target_lang') == 'gu' %}selected{% endif %}>Gujarati</option>
+            <option value="bn" {% if request.form.get('target_lang') == 'bn' %}selected{% endif %}>Bengali</option>
+            <option value="ur" {% if request.form.get('target_lang') == 'ur' %}selected{% endif %}>Urdu</option>
+            <option value="ml" {% if request.form.get('target_lang') == 'ml' %}selected{% endif %}>Malayalam</option>
+            <option value="kn" {% if request.form.get('target_lang') == 'kn' %}selected{% endif %}>kannada</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">Convert</button>
+    </form>
+
+    {% if translated_text or audio_file %}
+    <div class="d-flex justify-content-center mt-5">
+        <div class="text-center">
+            {% if translated_text %}
+                <h3>Translated Text:</h3>
+                <p>{{ translated_text }}</p>
+            {% endif %}
+
+            {% if audio_file %}
+                <h3>Generated Audio:</h3>
+                <audio controls class="mb-2">
+                    <source src="{{ url_for('static', filename=audio_file.split('/')[-1]) }}" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <br>
+                <a href="{{ url_for('download', filename=audio_file.split('/')[-1]) }}" class="btn btn-success mt-2">Download Audio</a>
+                <p class="mt-2">Selected voice: {{ selected_voice }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        new vanillaSelectBox("#voiceSelect", {
+            maxHeight: 200,
+            search: false,
+            translations: { "all": "All", "items": "voices" }
+        });
+    });
+</script>
+
+</body>
+</html>
